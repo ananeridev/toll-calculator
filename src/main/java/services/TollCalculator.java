@@ -1,16 +1,14 @@
 package services;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.*;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import src.main.model.TollFreeVehicles;
+
+import java.io.FileReader;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 
 public class TollCalculator {
@@ -90,26 +88,29 @@ public int getTollFee(final Date date, Vehicle vehicle) {
   if(Boolean.TRUE.equals(isTollFreeDate(date)) || isTollFreeVehicle(vehicle)) return 0;
   Calendar calendar = Calendar.getInstance();
   calendar.setTime(date);
-  int hour = calendar.get(Calendar.HOUR_OF_DAY);
+//  int hour = calendar.get(Calendar.HOUR_OF_DAY);
   int minute = calendar.get(Calendar.MINUTE);
 
-  int hourMinute = Integer.parseInt(String.format("%d%d", hour, minute));
-
+//  int hourMinute = Integer.parseInt(String.format("%d%d", hour, minute));
 
   JSONParser jsonParse = new JSONParser();
 
-  try(FileReader reader = new FileReader(("rushhours.json"));) {
+  try(FileReader reader = new FileReader("resources/rushhours.json")) {
 
-    Object obj  = jsonParse.parse(reader);
+    JSONArray obj  = (JSONArray) jsonParse.parse(reader);
 
-    for (JSONArray items = (JSONArray) obj)
-      if (items.get(Integer.parseInt("from")) <= items.get(Integer.parseInt("hour")) &&
-              items.get(Integer.parseInt("hour")) <= items.get(Integer.parseInt("to"))) break;
+    for (int index = 0; index <= obj.size(); index ++) {
+      JSONObject item = (JSONObject) obj.get(index);
+
+      int from = Integer.parseInt(item.get("from").toString());
+      int hour = Integer.parseInt(item.get("hour").toString());
+      int result = Integer.parseInt(item.get("result").toString());
+      System.out.println("");
+    }
 
   } catch (Exception e) {
     e.printStackTrace();
   }
-
   return 0;
 }
 
