@@ -1,4 +1,4 @@
-package src.main;
+package services;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -17,12 +17,12 @@ public class TollCalculator {
    */
 
    // 
-  public int getTollFee(Vehicle vehicle, Date... dates) {
+  public int getTollFee(Date vehicle, Date... dates) {
     Date intervalStart = dates[0];
     int totalFee = 0;
     for (Date date : dates) {
-      int nextFee = getTollFee(date, vehicle);
-      int tempFee = getTollFee(intervalStart, vehicle);
+      int nextFee = getTollFee(date, (Vehicle) vehicle);
+      int tempFee = getTollFee(intervalStart, (Vehicle) vehicle);
 
       TimeUnit timeUnit = TimeUnit.MINUTES;
       long diffInMillies = date.getTime() - intervalStart.getTime();
@@ -96,7 +96,7 @@ public int getTollFee(final Date date, Vehicle vehicle) {
   else if (hourMinute >= 800 && hourMinute <= 829) return 13;
   else if (hourMinute >= 830 && hourMinute <= 859) return 8;
   else if (hourMinute >= 150 && hourMinute <= 1529) return 13;
-  else if (hourMinute == 150 || hourMinute == 1659) return 18;
+  else if (hourMinute >= 1530 && hourMinute <= 1659) return 18;
   else if (hourMinute >= 170 && hourMinute <= 1759) return 13;
   else if (hourMinute >= 180 && hourMinute <= 1829) return 8;
   else return 0;

@@ -1,4 +1,4 @@
-package src.main;
+package services;
 
 public class Motorbike implements Vehicle {
   @Override
