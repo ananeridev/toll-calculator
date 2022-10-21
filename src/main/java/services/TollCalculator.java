@@ -1,8 +1,15 @@
 package services;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import src.main.model.TollFreeVehicles;
 
 
@@ -88,18 +95,22 @@ public int getTollFee(final Date date, Vehicle vehicle) {
 
   int hourMinute = Integer.parseInt(String.format("%d%d", hour, minute));
 
-  // rush hours calculo
-  // hashmap hour, minute
-  if (hourMinute >= 600 && hourMinute <= 629) return 8;
-  else if (hourMinute >= 630 && hourMinute <= 659) return 13;
-  else if (hourMinute >= 700 && hourMinute <= 759) return 18;
-  else if (hourMinute >= 800 && hourMinute <= 829) return 13;
-  else if (hourMinute >= 830 && hourMinute <= 859) return 8;
-  else if (hourMinute >= 150 && hourMinute <= 1529) return 13;
-  else if (hourMinute >= 1530 && hourMinute <= 1659) return 18;
-  else if (hourMinute >= 170 && hourMinute <= 1759) return 13;
-  else if (hourMinute >= 180 && hourMinute <= 1829) return 8;
-  else return 0;
+
+  JSONParser jsonParse = new JSONParser();
+
+  try(FileReader reader = new FileReader(("rushhours.json"));) {
+
+    Object obj  = jsonParse.parse(reader);
+
+    for (JSONArray items = (JSONArray) obj)
+      if (items.get(Integer.parseInt("from")) <= items.get(Integer.parseInt("hour")) &&
+              items.get(Integer.parseInt("hour")) <= items.get(Integer.parseInt("to"))) break;
+
+  } catch (Exception e) {
+    e.printStackTrace();
+  }
+
+  return 0;
 }
 
 
