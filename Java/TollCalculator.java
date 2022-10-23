@@ -1,4 +1,5 @@
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -11,12 +12,15 @@ public class TollCalculator {
    * @param dates   - date and time of all passes on one day
    * @return - the total toll fee for that day
    */
+
+   RushHoursDatabase rushHoursDatabase = new RushHoursDatabase();
+
   public int getTollFee(Vehicle vehicle, Date... dates) {
     Date intervalStart = dates[0];
     int totalFee = 0;
     for (Date date : dates) {
-      int nextFee = getTollFee(date, vehicle);
-      int tempFee = getTollFee(intervalStart, vehicle);
+      int nextFee = rushHoursDatabase.getTollFeeAtPeakTimesCauculus(date, vehicle);
+      int tempFee = rushHoursDatabase.getTollFeeAtPeakTimesCauculus(intervalStart, vehicle);
 
       TimeUnit timeUnit = TimeUnit.MINUTES;
       long diffInMillies = date.getTime() - intervalStart.getTime();
@@ -34,7 +38,7 @@ public class TollCalculator {
     return totalFee;
   }
 
-  private boolean isTollFreeVehicle(Vehicle vehicle) {
+  public boolean isTollFreeVehicle(Vehicle vehicle) {
     if(vehicle == null) return false;
     String vehicleType = vehicle.getType();
     return vehicleType.equals(TollFreeVehicles.MOTORBIKE.getType()) ||
@@ -45,26 +49,8 @@ public class TollCalculator {
            vehicleType.equals(TollFreeVehicles.MILITARY.getType());
   }
 
-  public int getTollFee(final Date date, Vehicle vehicle) {
-    if(isTollFreeDate(date) || isTollFreeVehicle(vehicle)) return 0;
-    Calendar calendar = GregorianCalendar.getInstance();
-    calendar.setTime(date);
-    int hour = calendar.get(Calendar.HOUR_OF_DAY);
-    int minute = calendar.get(Calendar.MINUTE);
 
-    if (hour == 6 && minute >= 0 && minute <= 29) return 8;
-    else if (hour == 6 && minute >= 30 && minute <= 59) return 13;
-    else if (hour == 7 && minute >= 0 && minute <= 59) return 18;
-    else if (hour == 8 && minute >= 0 && minute <= 29) return 13;
-    else if (hour >= 8 && hour <= 14 && minute >= 30 && minute <= 59) return 8;
-    else if (hour == 15 && minute >= 0 && minute <= 29) return 13;
-    else if (hour == 15 && minute >= 0 || hour == 16 && minute <= 59) return 18;
-    else if (hour == 17 && minute >= 0 && minute <= 59) return 13;
-    else if (hour == 18 && minute >= 0 && minute <= 29) return 8;
-    else return 0;
-  }
-
-  private Boolean isTollFreeDate(Date date) {
+  public Boolean isTollFreeDate(Date date) {
     Calendar calendar = GregorianCalendar.getInstance();
     calendar.setTime(date);
     int year = calendar.get(Calendar.YEAR);
@@ -89,22 +75,5 @@ public class TollCalculator {
     return false;
   }
 
-  private enum TollFreeVehicles {
-    MOTORBIKE("Motorbike"),
-    TRACTOR("Tractor"),
-    EMERGENCY("Emergency"),
-    DIPLOMAT("Diplomat"),
-    FOREIGN("Foreign"),
-    MILITARY("Military");
-    private final String type;
-
-    TollFreeVehicles(String type) {
-      this.type = type;
-    }
-
-    public String getType() {
-      return type;
-    }
-  }
 }
 
