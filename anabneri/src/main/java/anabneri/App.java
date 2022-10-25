@@ -1,9 +1,10 @@
-import java.util.Date;
+package anabneri;
 
-public class Client {
-
-    public static void main(String[] args) {
-
+public class App 
+{
+    public static void main( String[] args )
+    {
+        
         RushHoursDatabase rushHoursDatabase = new RushHoursDatabase();
         Car car = new Car();
         Date newDate = new Date(2022,10,22, 6, 00);

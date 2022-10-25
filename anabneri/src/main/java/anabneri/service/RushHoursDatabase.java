@@ -1,3 +1,5 @@
+package anabneri.main.java.anabneri;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -73,9 +75,9 @@ public class RushHoursDatabase {
 
     public int getTollFeeAtPeakTimesCauculus(final Date date, Vehicle vehicle) {
 
-        // TollCalculator tollCalculator = new TollCalculator();
+         TollCalculator tollCalculator = new TollCalculator();
 
-        // if(Boolean.TRUE.equals(tollCalculator.isTollFreeDate(date)) || tollCalculator.isTollFreeVehicle(vehicle)) return 0;
+         if(Boolean.TRUE.equals(tollCalculator.isTollFreeDate(date)) || tollCalculator.isTollFreeVehicle(vehicle)) return 0;
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -93,7 +95,6 @@ public class RushHoursDatabase {
         int result  = option.get("result");
 
         if (hourMinute >= from && hourMinute <= to) {
-            System.out.println(result);
             finalResult = result;
             break;
           }

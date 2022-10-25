@@ -1,4 +1,3 @@
-
 public enum TollFreeVehicles {
         MOTORBIKE("Motorbike"),
         TRACTOR("Tractor"),
