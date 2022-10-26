@@ -1,6 +1,10 @@
+package src.main;
 
 import java.util.*;
 import java.util.concurrent.*;
+
+import src.main.model.TollFreeVehicles;
+
 
 public class TollCalculator {
 
@@ -11,6 +15,8 @@ public class TollCalculator {
    * @param dates   - date and time of all passes on one day
    * @return - the total toll fee for that day
    */
+
+   // 
   public int getTollFee(Vehicle vehicle, Date... dates) {
     Date intervalStart = dates[0];
     int totalFee = 0;
@@ -34,38 +40,21 @@ public class TollCalculator {
     return totalFee;
   }
 
-  private boolean isTollFreeVehicle(Vehicle vehicle) {
+  // verify if is a vehible able to not pay the fee
+  public boolean isTollFreeVehicle(Vehicle vehicle) {
     if(vehicle == null) return false;
     String vehicleType = vehicle.getType();
-    return vehicleType.equals(TollFreeVehicles.MOTORBIKE.getType()) ||
-           vehicleType.equals(TollFreeVehicles.TRACTOR.getType()) ||
-           vehicleType.equals(TollFreeVehicles.EMERGENCY.getType()) ||
-           vehicleType.equals(TollFreeVehicles.DIPLOMAT.getType()) ||
-           vehicleType.equals(TollFreeVehicles.FOREIGN.getType()) ||
-           vehicleType.equals(TollFreeVehicles.MILITARY.getType());
+    return vehicleType.equals(TollFreeVehicles.MOTORBIKE.toString()) ||
+           vehicleType.equals(TollFreeVehicles.TRACTOR.toString()) ||
+           vehicleType.equals(TollFreeVehicles.EMERGENCY.toString()) ||
+           vehicleType.equals(TollFreeVehicles.DIPLOMAT.toString()) ||
+           vehicleType.equals(TollFreeVehicles.FOREIGN.toString()) ||
+           vehicleType.equals(TollFreeVehicles.MILITARY.toString());
   }
 
-  public int getTollFee(final Date date, Vehicle vehicle) {
-    if(isTollFreeDate(date) || isTollFreeVehicle(vehicle)) return 0;
-    Calendar calendar = GregorianCalendar.getInstance();
-    calendar.setTime(date);
-    int hour = calendar.get(Calendar.HOUR_OF_DAY);
-    int minute = calendar.get(Calendar.MINUTE);
-
-    if (hour == 6 && minute >= 0 && minute <= 29) return 8;
-    else if (hour == 6 && minute >= 30 && minute <= 59) return 13;
-    else if (hour == 7 && minute >= 0 && minute <= 59) return 18;
-    else if (hour == 8 && minute >= 0 && minute <= 29) return 13;
-    else if (hour >= 8 && hour <= 14 && minute >= 30 && minute <= 59) return 8;
-    else if (hour == 15 && minute >= 0 && minute <= 29) return 13;
-    else if (hour == 15 && minute >= 0 || hour == 16 && minute <= 59) return 18;
-    else if (hour == 17 && minute >= 0 && minute <= 59) return 13;
-    else if (hour == 18 && minute >= 0 && minute <= 29) return 8;
-    else return 0;
-  }
-
-  private Boolean isTollFreeDate(Date date) {
-    Calendar calendar = GregorianCalendar.getInstance();
+  public Boolean isTollFreeDate(Date date) {
+    // change gregorian calendar to calendar beacause calendar already attend the gregorian specification
+    Calendar calendar = Calendar.getInstance();
     calendar.setTime(date);
     int year = calendar.get(Calendar.YEAR);
     int month = calendar.get(Calendar.MONTH);
@@ -74,6 +63,7 @@ public class TollCalculator {
     int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
     if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) return true;
 
+    // all holidays on the year 2013
     if (year == 2013) {
       if (month == Calendar.JANUARY && day == 1 ||
           month == Calendar.MARCH && (day == 28 || day == 29) ||
@@ -89,22 +79,29 @@ public class TollCalculator {
     return false;
   }
 
-  private enum TollFreeVehicles {
-    MOTORBIKE("Motorbike"),
-    TRACTOR("Tractor"),
-    EMERGENCY("Emergency"),
-    DIPLOMAT("Diplomat"),
-    FOREIGN("Foreign"),
-    MILITARY("Military");
-    private final String type;
+public int getTollFee(final Date date, Vehicle vehicle) {
+  if(Boolean.TRUE.equals(isTollFreeDate(date)) || isTollFreeVehicle(vehicle)) return 0;
+  Calendar calendar = Calendar.getInstance();
+  calendar.setTime(date);
+  int hour = calendar.get(Calendar.HOUR_OF_DAY);
+  int minute = calendar.get(Calendar.MINUTE);
 
-    TollFreeVehicles(String type) {
-      this.type = type;
-    }
+  int hourMinute = Integer.parseInt(String.format("%d%d", hour, minute));
 
-    public String getType() {
-      return type;
-    }
-  }
+  // rush hours calculo
+  // hashmap hour, minute
+  if (hourMinute >= 600 && hourMinute <= 629) return 8;
+  else if (hourMinute >= 630 && hourMinute <= 659) return 13;
+  else if (hourMinute >= 700 && hourMinute <= 759) return 18;
+  else if (hourMinute >= 800 && hourMinute <= 829) return 13;
+  else if (hourMinute >= 830 && hourMinute <= 859) return 8;
+  else if (hourMinute >= 150 && hourMinute <= 1529) return 13;
+  else if (hourMinute == 150 || hourMinute == 1659) return 18;
+  else if (hourMinute >= 170 && hourMinute <= 1759) return 13;
+  else if (hourMinute >= 180 && hourMinute <= 1829) return 8;
+  else return 0;
+}
+
+
 }
 
